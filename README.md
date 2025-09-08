@@ -1,2 +1,2 @@
 # cypresstests
-GOİT kursunda öğrendiğim cypress bilgileri ile oluşturulmuş projeler.
+GOİT kursunda öğrendiğim cypress bilgileri ile oluşturulmuş performans testleri.
