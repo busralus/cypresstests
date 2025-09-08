@@ -1,0 +1,49 @@
+config:
+  target: "<https://api.edu.goit.global/api/v1>"
+  phases:
+    - duration: 1
+      arrivalRate: 1
+      name: Hooks practice
+**before**:
+  flow:
+      - post:
+          url: "{{target}}/auth/login"
+          json:
+            username: "artillery_test@qa.team"
+            password: "6VcapnJ9X!Rw9UQ"
+          capture:
+            - json: "$.accessToken"
+              as: "accessToken"
+            - json: "$.refreshToken"
+              as: "refreshToken"
+**after**:
+  flow:
+      - get:
+          url: "{{target}}/auth/logout"
+          cookie:
+            refreshToken: "{{refreshToken}}"
+          headers:
+            "Authorization": "Bearer {{ accessToken }}"
+scenarios:
+  - name: Get UserInfo
+    flow:
+      - get:
+          url: "{{ target }}/auth/getUserInfo"
+          headers:
+            "Authorization": "Bearer {{ accessToken }}"
+
+#Hooks — bir test framework'ü için standart bir araçtır ve senaryo başlamadan önce ve/veya senaryo tamamlandıktan sonra gerçekleştirilmesi gereken 
+#işlemleri tanımlamanıza olanak tanır.
+
+#"Before" hook'unu testi hazırlamak veya bir ön koşul olarak tanımlayabiliriz, "after" hook'unu ise cleanup (ya da "geriye temizleme") olarak tanımlayabiliriz.
+
+#En yaygın hook örneği, kullanıcı adı ve parola kullanarak bir yetkilendirme token'ı almak ve bunu test senaryolarında kullanılmak üzere bir değişkende 
+#saklamaktır. Senaryo tamamlandıktan sonra ise oturum kapatılır. Bu yaklaşım, birden fazla istek içeren senaryolarda her seferinde yetkilendirme yapma 
+#ihtiyacını ortadan kaldırır. Ayrıca, before ve after bölümlerindeki HTTP isteklerinin test raporundaki metrikleri etkilemediğini unutmamak gerekir.
+
+#İlk olarak, before hook'unda /auth/login endpoint'ine bir POST isteği gönderilir ve capture yardımıyla accessToken ve refreshToken saklanır. 
+#Bu token'lar, ilerleyen test senaryolarında kullanılacaktır.
+#Sonrasında, "Get UserInfo" senaryosu çalıştırılır ve burada accessToken, header oluşturulmasında kullanılır. Tüm senaryolar tamamlandıktan sonra ise 
+#after hook'u çalıştırılır ve sanal kullanıcı /auth/logout isteği göndererek oturumu kapatır. Bu işlem sırası her bir sanal kullanıcı için aynıdır.
+
+
