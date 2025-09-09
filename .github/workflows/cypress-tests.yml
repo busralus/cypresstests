@@ -27,8 +27,10 @@ jobs:
 
       - name: Verify Cypress
         run: npx cypress install
+        working-directory: ./
 
       # 4. Cypress testlerini çalıştır
       - name: Run Cypress tests
         run: npx cypress run
+        working-directory: ./
 
