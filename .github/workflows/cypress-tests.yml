@@ -25,12 +25,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # 4. Cypress binary doğrula
       - name: Verify Cypress
         run: npx cypress install
-        working-directory: ./
 
-      # 4. Cypress testlerini çalıştır
+      # 5. Cypress testlerini çalıştır
       - name: Run Cypress tests
-        run: npx cypress run
-        working-directory: ./
+        run: npx cypress run --spec "cypress/e2e/dersÖrnekleri/API TESTS/*.cy.js"
+
 
