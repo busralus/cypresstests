@@ -1,0 +1,52 @@
+config:
+  target: 'http://httpbin.org/'
+  phases:
+    - duration: 300
+      arrivalRate: 2
+      name: Spike-pre Warm-Up
+    - duration: 10
+      arrivalRate: 20
+      name: Spike test
+    - duration: 300
+      arrivalRate: 2
+      name: Spike-post Cool-down
+
+  plugins:
+    ensure:
+      thresholds:
+        - http.response_time.p95: 1000
+        - http.response_time.max: 1500
+      conditions:
+        - expression: http.responses == 2
+        - expression: http.response_time.max <1000 and http.response_time.2xx.p95 <500
+scenarios:
+  - name: Getting a resource
+    flow:
+      - get:
+          url: "{{target}}post" 
+      - post:
+          url: "{{target}}post"  
+          json:                     
+            username: 'Goit'        
+            password: '12345'      
+          headers:                  
+            Content-Type: 'application/json'   
+          capture:                  
+            - json: '$.json'        
+              as: 'response_body'     
+            - json: '$.headers.Host'  
+              as: 'host'              
+            - json: '$'             
+              as: 'full_body'
+
+
+#Spike testi de birkaç faz içerir. Bu, beklenmedik şekilde yüksek bir yük artışı yapmak ve ardından normal seviyelere geri dönmektir.
+#İlk olarak, sistem 5 dakika boyunca beklenen yükle çalıştırılır.
+#Ardından, sanal kullanıcı sayısında ani ve kısa süreli bir artış simüle edilir.
+#Spike sonrası, sistemi tekrar beklenen yük seviyelerine stabilize ederiz.
+#Spike sırasında sistemin nasıl davranmasını isteriz? Öncelikle, bu durum mevcut kullanıcıların sistem deneyimini en az şekilde etkilemelidir, 
+#yani istek sürelerindeki değişimleri izlemek gereklidir. İkinci olarak, yeni kullanıcıların kötü bir deneyim yaşayıp siteyi tamamen terk etmemesi 
+#gerektiği için, hata sayısını ve sistemin olağan dışı tepkilerini izlemek gerekir.
+#İnternet — genel olarak oldukça volatil ve kararsız bir ortamdır ve bu tür beklenmedik dalgalanmalar — normal bir durumdur. Bu, örneğin test ettiğimiz 
+#kaynağın internet trendlerine girmesi veya pazarlama departmanının geliştiricileri bilgilendirmeden başlattığı bir reklam kampanyasının sonucu olabilir.
+#Bu tür durumlarda sorunları önlemek için spike testi yapılır.
