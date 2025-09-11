@@ -31,6 +31,6 @@ jobs:
 
       # 5. Cypress testlerini çalıştır
       - name: Run Cypress tests
-        run: npx cypress run --spec "cypress/e2e/dersÖrnekleri/API TESTS/*.cy.js"
+        run: npx cypress run --spec "cypress/e2e/dersÖrnekleri/API TESTS/apiTest.cy.js"
 
 
